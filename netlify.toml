@@ -1,7 +1,10 @@
-# Toolbench — Netlify config (safe for drag-and-drop deploys)
-# No [build] section: on a manual deploy the dropped folder/zip IS the site root,
-# so we must NOT set a publish path (that can cause a root 404). Netlify
-# auto-detects the netlify/functions folder and bundles it.
+# Toolbench — Netlify config (Git-based deploy)
+# Netlify builds from the repo, bundles the functions in netlify/functions,
+# and publishes the repo root as the site.
+
+[build]
+  publish = "."
+  functions = "netlify/functions"
 
 [functions]
   node_bundler = "esbuild"

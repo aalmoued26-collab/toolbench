@@ -18,9 +18,14 @@ const EL_HOST = 'https://api.elevenlabs.io';
 
 /* ---- model config (override via env) ---- */
 const MODELS = {
-  character: process.env.FAL_MODEL_CHARACTER || 'fal-ai/flux-pro/kontext',
+  // Fast identity-preserving edit model — good for turnarounds & outfit swaps
+  // and quick enough to finish inside the function time limit.
+  character: process.env.FAL_MODEL_CHARACTER || 'fal-ai/nano-banana/edit',
   image:     process.env.FAL_MODEL_IMAGE     || 'fal-ai/flux/dev',
   talking:   process.env.FAL_MODEL_TALKING   || 'fal-ai/veed/fabric-1.0',
+  // Fast image-EDIT model for packaging: wraps the uploaded artwork onto a
+  // realistic package while keeping the logo/colours/layout faithful.
+  packEdit:  process.env.FAL_MODEL_PACK_EDIT || 'fal-ai/nano-banana/edit',
 };
 /* Only these models may be invoked — stops the public endpoint from being used
    to run arbitrary (expensive) fal models. */
@@ -73,6 +78,35 @@ async function runFal(model, input, timeoutMs = 200000) {
     if (st.status === 'FAILED') throw new Error('fal job failed');
   }
   throw new Error('fal: timed out (the model took too long)');
+}
+
+/* ---- fal: SUBMIT-then-POLL (for long jobs like video) ----
+   falSubmit kicks the job off and returns a request id fast (well under the
+   function time limit). falStatus is polled by the browser until it's done, so
+   fal's own queue is the job store — no database needed. */
+async function falSubmit(model, input) {
+  if (!ALLOWED.has(model)) throw new Error('model not allowed: ' + model);
+  const headers = { Authorization: `Key ${falKey()}`, 'Content-Type': 'application/json' };
+  const submit = await fetch(`${FAL_HOST}/${model}`, { method: 'POST', headers, body: JSON.stringify(input) });
+  if (!submit.ok) throw new Error(`fal submit ${submit.status}: ${(await submit.text()).slice(0, 300)}`);
+  const { request_id } = await submit.json();
+  if (!request_id) throw new Error('fal: no request_id');
+  return request_id;
+}
+async function falStatus(model, requestId) {
+  if (!ALLOWED.has(model)) throw new Error('model not allowed');
+  const headers = { Authorization: `Key ${falKey()}` };
+  const base = `${FAL_HOST}/${model.split('/').slice(0, 2).join('/')}/requests/${requestId}`;
+  const s = await fetch(`${base}/status`, { headers });
+  if (!s.ok) return { status: 'processing' };
+  const st = await s.json();
+  if (st.status === 'COMPLETED') {
+    const res = await fetch(base, { headers });
+    if (!res.ok) throw new Error('fal result ' + res.status);
+    return { status: 'done', data: await res.json() };
+  }
+  if (st.status === 'FAILED') return { status: 'failed' };
+  return { status: 'processing' };
 }
 
 function pickImage(data) {
@@ -163,7 +197,7 @@ function bufferToDataUrl(buffer, mime) {
 
 module.exports = {
   MODELS, CORS, json, preflight,
-  runFal, pickImage, pickVideo,
+  runFal, falSubmit, falStatus, pickImage, pickVideo,
   cloneVoice, tts, speechToSpeech,
   decodeDataUrl, bufferToDataUrl,
 };

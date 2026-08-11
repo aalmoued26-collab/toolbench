@@ -15,6 +15,12 @@
   function rect(x,y,w,h,s){return '<rect x="'+r(x)+'" y="'+r(y)+'" width="'+r(w)+'" height="'+r(h)+'" '+s+'/>';}
   function text(x,y,str,extra){return '<text x="'+r(x)+'" y="'+r(y)+'" '+LBL+(extra?' '+extra:'')+'>'+esc(str)+'</text>';}
   function hDim(x,y,w,label){return line(x,y,x+w,y,DIM)+line(x,y-1.5,x,y+1.5,DIM)+line(x+w,y-1.5,x+w,y+1.5,DIM)+text(x+w/2-label.length*1.1,y-1.2,label);}
+  var _clip=0;
+  function panelArt(art,x,y,w,h){
+    var id='cp'+(_clip++);
+    return '<clipPath id="'+id+'"><rect x="'+r(x)+'" y="'+r(y)+'" width="'+r(w)+'" height="'+r(h)+'"/></clipPath>'+
+      '<image href="'+art+'" x="'+r(x)+'" y="'+r(y)+'" width="'+r(w)+'" height="'+r(h)+'" preserveAspectRatio="xMidYMid slice" clip-path="url(#'+id+')"/>';
+  }
 
   function tuckEnd(spec, reverse){
     var W=spec.width_mm, H=spec.height_mm, D=spec.depth_mm;
@@ -24,6 +30,13 @@
     var xBack=x0, xSide1=x0+W, xFront=xSide1+D, xSide2=xFront+W, xGlue=xSide2+D;
     var p=[];
     p.push(rect(x0-bleed,y0-bleed,bodyW+bleed*2,bodyH+bleed*2,BLEED));
+    if(spec.artwork){
+      p.push('<defs></defs>');
+      p.push(panelArt(spec.artwork,xFront,y0,W,bodyH));
+      p.push(panelArt(spec.artwork,xBack,y0,W,bodyH));
+      p.push(panelArt(spec.artwork,xSide1,y0,D,bodyH));
+      p.push(panelArt(spec.artwork,xSide2,y0,D,bodyH));
+    }
     p.push(rect(x0,y0,bodyW,bodyH,CUT));
     [xSide1,xFront,xSide2,xGlue].forEach(function(cx){p.push(line(cx,y0,cx,y0+bodyH,CREASE));});
     var topTuckX=reverse?xBack:xFront;
@@ -32,7 +45,7 @@
     var yb=y0+bodyH, botTuckX=reverse?xFront:xBack;
     p.push(line(botTuckX,yb,botTuckX,yb+tuck,CUT),line(botTuckX,yb+tuck,botTuckX+W,yb+tuck,CUT),line(botTuckX+W,yb+tuck,botTuckX+W,yb,CUT),line(botTuckX,yb,botTuckX+W,yb,CREASE));
     [xSide1,xSide2].forEach(function(sx){p.push(line(sx,yb,sx,yb+dust,CUT),line(sx,yb+dust,sx+D,yb+dust,CUT),line(sx+D,yb+dust,sx+D,yb,CUT),line(sx,yb,sx+D,yb,CREASE));});
-    p.push(text(xBack+W/2-6,y0+bodyH/2,'BACK'),text(xSide1+D/2-6,y0+bodyH/2,'SIDE'),text(xFront+W/2-7,y0+bodyH/2,'FRONT'),text(xSide2+D/2-6,y0+bodyH/2,'SIDE'));
+    if(!spec.artwork){ p.push(text(xBack+W/2-6,y0+bodyH/2,'BACK'),text(xSide1+D/2-6,y0+bodyH/2,'SIDE'),text(xFront+W/2-7,y0+bodyH/2,'FRONT'),text(xSide2+D/2-6,y0+bodyH/2,'SIDE')); }
     p.push('<text x="'+r(xGlue+1)+'" y="'+r(y0+bodyH/2)+'" '+LBL+' transform="rotate(90 '+r(xGlue+3)+' '+r(y0+bodyH/2)+')">GLUE</text>');
     p.push(hDim(xBack,y0+bodyH+tuck+6,W,'W '+W+'mm'),hDim(xSide1,y0+bodyH+tuck+12,D,'D '+D+'mm'));
     p.push('<text x="'+r(x0-8)+'" y="'+r(y0+bodyH/2)+'" '+LBL+' transform="rotate(-90 '+r(x0-8)+' '+r(y0+bodyH/2)+')">H '+H+'mm</text>');

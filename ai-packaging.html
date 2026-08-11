@@ -32,7 +32,7 @@
   <div class="panel">
     <p class="panel-label">1 · Branding &amp; colours <span style="color:var(--faint)">(optional)</span></p>
     <input type="file" id="pk-file" accept="image/*" style="padding:10px">
-    <p class="hint">Upload a logo or existing design. Colours are read from it in your browser to build the palette.</p>
+    <p class="hint">Upload your actual product design / label (a real design image, not a screenshot of a window). It builds the colour palette, gets printed onto the dieline, and is wrapped onto the 3D mockups.</p>
     <div id="pk-swatches" class="checks" style="margin-top:12px"></div>
   </div>
 
@@ -70,9 +70,8 @@
   </div>
 
   <div class="panel" id="pk-mockPanel" style="display:none">
-    <p class="panel-label">Photorealistic mockup</p>
-    <img id="pk-mockImg" alt="Packaging mockup" style="width:100%;max-width:520px;border:1px solid var(--line);border-radius:10px;background:#fff">
-    <div class="controls"><a class="btn btn-ghost btn-sm" id="pk-mockDownload" download="mockup.png">Download mockup</a></div>
+    <p class="panel-label">Photorealistic mockups — your design, several angles</p>
+    <div id="pk-mockGallery" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px"></div>
   </div>
   </div>
 
@@ -114,6 +113,7 @@
       depth_mm:+document.getElementById('pk-d').value||40,
       height_mm:+document.getElementById('pk-h').value||150,
       material:document.getElementById('pk-finish').value,
+      artwork:artworkData,
       title:(document.getElementById('pk-name').value||'Package')+' — '+document.getElementById('pk-style').value };
   }
   document.getElementById('pk-dieline').onclick=function(){
@@ -126,21 +126,34 @@
     document.getElementById('pk-diePanel').style.display='';
     window.toast('Dieline ready');
   };
-  document.getElementById('pk-mockup').onclick=function(){
+  var ANGLES=[
+    'three-quarter hero angle showing the front and one side',
+    'flat front-facing packshot, straight on',
+    'back panel facing the camera',
+    'top-down angle showing the lid'
+  ];
+  document.getElementById('pk-mockup').onclick=async function(){
+    if(!artworkData){ window.toast('Upload your design in step 1 first — the mockups use it'); return; }
     var st=document.getElementById('pk-status'), btn=this;
-    btn.disabled=true; st.textContent='Rendering mockup… 20–60 seconds.';
-    fetch('/api/packaging-mockup',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({ boxStyle:document.getElementById('pk-style').value,
-        productName:document.getElementById('pk-name').value, colors:colors,
-        finish:document.getElementById('pk-finish').value })})
-      .then(function(x){return x.json().then(function(j){return {ok:x.ok,j:j};});})
-      .then(function(res){ btn.disabled=false; st.textContent='';
-        if(!res.ok){st.textContent=res.j.error||'Failed'; window.toast(res.j.error||'Mockup failed'); return;}
-        document.getElementById('pk-mockImg').src=res.j.imageUrl;
-        document.getElementById('pk-mockDownload').href=res.j.imageUrl;
-        document.getElementById('pk-mockPanel').style.display=''; window.toast('Mockup ready');
-      })
-      .catch(function(err){btn.disabled=false; st.textContent=String(err); window.toast('Network error');});
+    var gallery=document.getElementById('pk-mockGallery');
+    gallery.innerHTML=''; document.getElementById('pk-mockPanel').style.display='';
+    btn.disabled=true;
+    for(var i=0;i<ANGLES.length;i++){
+      st.textContent='Generating mockup '+(i+1)+' of '+ANGLES.length+'…';
+      try{
+        var res=await fetch('/api/packaging-mockup',{method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({ artworkDataUrl:artworkData, boxStyle:document.getElementById('pk-style').value,
+            productName:document.getElementById('pk-name').value, finish:document.getElementById('pk-finish').value,
+            angle:ANGLES[i] })});
+        var j=await res.json();
+        if(!res.ok){ window.toast(j.error||'A mockup failed'); st.textContent=j.error||'Failed'; continue; }
+        var card=document.createElement('div');
+        card.innerHTML='<img src="'+j.imageUrl+'" alt="Mockup" style="width:100%;border:1px solid var(--line);border-radius:10px;background:#fff">'+
+          '<a class="btn btn-ghost btn-sm" style="margin-top:8px" href="'+j.imageUrl+'" download="mockup-'+(i+1)+'.png">Download</a>';
+        gallery.appendChild(card);
+      }catch(err){ window.toast('Network error'); st.textContent=String(err); }
+    }
+    btn.disabled=false; st.textContent='Done'; window.toast('Mockups ready');
   };
 })();
 </script>
