@@ -81,6 +81,87 @@
       '<text x="6" y="'+r(totalH-6)+'" font-family="Helvetica,Arial,sans-serif" font-size="3.5" fill="#888888">CUT = magenta solid · CREASE = blue dashed · BLEED 3mm = grey · scale 1:1 (mm)</text>'+
       '</svg>';
   }
+  // Full per-panel packaging design: front = artwork, back = info/nutrition,
+  // sides = logo + product name. Returns a print-ready SVG (1:1 mm).
+  window.buildPackagingArt = function(spec){
+    var W=+spec.width_mm||80, H=+spec.height_mm||150, D=+spec.depth_mm||40;
+    var g=spec.glue_mm||12, bleed=spec.bleed_mm||3, tuck=Math.min(D,35), dust=D-3, margin=25;
+    var reverse = spec.style==='reverse_tuck_end';
+    var bodyW=2*W+2*D+g, bodyH=H, totalW=bodyW+margin*2, totalH=bodyH+tuck*2+margin*2;
+    var x0=margin, y0=margin+tuck;
+    var xBack=x0, xSide1=x0+W, xFront=xSide1+D, xSide2=xFront+W, xGlue=xSide2+D;
+    var bg=spec.brandColor||'#6e3a24', tc=spec.textColor||'#f5ead4';
+    function isAr(s){return /[؀-ۿ]/.test(s||'');}
+    function wrapTxt(s,max){var w=(s||'').split(/\s+/),ln='',out=[];for(var i=0;i<w.length;i++){var t=(ln?ln+' ':'')+w[i];if(t.length>max&&ln){out.push(ln);ln=w[i];}else ln=t;}if(ln)out.push(ln);return out;}
+    function t(x,y,s,size,color,anchor,rtl,weight){ if(!s&&s!==0) return ''; return '<text x="'+r(x)+'" y="'+r(y)+'" font-family="Arial,Helvetica,sans-serif" font-size="'+size+'" fill="'+(color||'#222')+'"'+(anchor?' text-anchor="'+anchor+'"':'')+(rtl?' direction="rtl"':'')+(weight?' font-weight="'+weight+'"':'')+'>'+esc(s)+'</text>'; }
+    function bgRect(x,w){ return '<rect x="'+r(x)+'" y="'+r(y0)+'" width="'+r(w)+'" height="'+r(bodyH)+'" fill="'+bg+'"/>'; }
+    var p=[];
+    p.push(rect(x0-bleed,y0-bleed,bodyW+bleed*2,bodyH+bleed*2,BLEED));
+    p.push(bgRect(xBack,W)); p.push(bgRect(xSide1,D)); p.push(bgRect(xSide2,D)); p.push(bgRect(xGlue,g));
+    // FRONT — the uploaded design, fit to the front panel
+    if(spec.frontImg) p.push(panelArt(spec.frontImg, xFront, y0, W, H)); else p.push(bgRect(xFront,W));
+
+    // BACK — editable info card
+    var pad=5, bx=xBack+pad, by=y0+pad, bw=W-2*pad;
+    p.push('<rect x="'+r(bx)+'" y="'+r(by)+'" width="'+r(bw)+'" height="'+r(bodyH-2*pad)+'" rx="2" fill="#ffffff" opacity="0.94"/>');
+    var yy=by+8;
+    p.push(t(xBack+W/2, yy, spec.productName||'Product', 5, '#3a2a1a','middle',isAr(spec.productName),'bold')); yy+=8;
+    if(spec.ingredients){
+      p.push(t(bx+2, yy, isAr(spec.ingredients)?'المكوّنات':'Ingredients', 3.4,'#7a3b24','start',false,'bold')); yy+=5;
+      var lines=wrapTxt(spec.ingredients,44);
+      for(var i=0;i<lines.length&&i<6;i++){ p.push(t(bx+2, yy, lines[i], 3,'#333','start',isAr(lines[i]))); yy+=4; }
+      yy+=3;
+    }
+    if(spec.nutrition&&spec.nutrition.length){
+      p.push(t(bx+2, yy, 'Nutrition / القيمة الغذائية', 3.4,'#7a3b24','start',false,'bold')); yy+=5;
+      for(var n=0;n<spec.nutrition.length&&n<7;n++){
+        var row=spec.nutrition[n];
+        p.push(t(bx+2, yy, row.label, 3,'#333','start',isAr(row.label)));
+        p.push(t(bx+bw-2, yy, row.value, 3,'#333','end'));
+        p.push('<line x1="'+r(bx+2)+'" y1="'+r(yy+1.2)+'" x2="'+r(bx+bw-2)+'" y2="'+r(yy+1.2)+'" stroke="#dddddd" stroke-width="0.2"/>');
+        yy+=4.4;
+      }
+      yy+=3;
+    }
+    if(spec.netWeight){ p.push(t(bx+2, yy, (isAr(spec.netWeight)?'':'Net weight: ')+spec.netWeight, 3.4,'#333','start',isAr(spec.netWeight),'bold')); yy+=6; }
+    if(spec.barcode){
+      var bcy=by+bodyH-2*pad-16, bcx=bx+3, bcw=bw-6;
+      p.push('<rect x="'+r(bcx)+'" y="'+r(bcy)+'" width="'+r(bcw)+'" height="11" fill="#ffffff"/>');
+      var bxx=bcx+3, seed=1234567;
+      while(bxx<bcx+bcw-3){
+        seed=(seed*1103515245+12345)&0x7fffffff; var wd=0.28+((seed>>8)%4)*0.12;
+        p.push('<rect x="'+r(bxx)+'" y="'+r(bcy+1)+'" width="'+r(wd)+'" height="8" fill="#000000"/>');
+        bxx+=wd;
+        seed=(seed*1103515245+12345)&0x7fffffff; bxx+=0.25+((seed>>8)%3)*0.12;
+      }
+    }
+    p.push(t(xBack+W/2, y0+bodyH-3, spec.producedIn||'Produced in Kuwait — صنع في الكويت', 2.8,'#7a3b24','middle',true));
+
+    // SIDES — logo + rotated product name
+    function fillSide(sx){
+      if(spec.logoImg){ p.push('<image href="'+spec.logoImg+'" x="'+r(sx+D*0.12)+'" y="'+r(y0+6)+'" width="'+r(D*0.76)+'" height="'+r(D*0.76)+'" preserveAspectRatio="xMidYMid meet"/>'); }
+      var cx=sx+D/2, cy=y0+bodyH*0.58, fs=Math.min(6,D*0.16);
+      p.push('<text x="'+r(cx)+'" y="'+r(cy)+'" font-family="Arial,Helvetica,sans-serif" font-size="'+fs+'" fill="'+tc+'" text-anchor="middle" font-weight="bold" transform="rotate(-90 '+r(cx)+' '+r(cy)+')"'+(isAr(spec.productName)?' direction="rtl"':'')+'>'+esc(spec.productName||'')+'</text>');
+      p.push(t(cx, y0+bodyH-3, isAr(spec.producedIn)?'الكويت':'KUWAIT', 2.6, tc,'middle'));
+    }
+    fillSide(xSide1); fillSide(xSide2);
+    p.push('<text x="'+r(xGlue+2)+'" y="'+r(y0+bodyH/2)+'" '+LBL+' transform="rotate(90 '+r(xGlue+3)+' '+r(y0+bodyH/2)+')">GLUE</text>');
+
+    // dieline lines on top
+    p.push(rect(x0,y0,bodyW,bodyH,CUT));
+    [xSide1,xFront,xSide2,xGlue].forEach(function(cx){p.push(line(cx,y0,cx,y0+bodyH,CREASE));});
+    var topTuckX=reverse?xBack:xFront;
+    p.push(line(topTuckX,y0,topTuckX,y0-tuck,CUT),line(topTuckX,y0-tuck,topTuckX+W,y0-tuck,CUT),line(topTuckX+W,y0-tuck,topTuckX+W,y0,CUT),line(topTuckX,y0,topTuckX+W,y0,CREASE));
+    [xSide1,xSide2].forEach(function(sx){p.push(line(sx,y0,sx,y0-dust,CUT),line(sx,y0-dust,sx+D,y0-dust,CUT),line(sx+D,y0-dust,sx+D,y0,CUT),line(sx,y0,sx+D,y0,CREASE));});
+    var yb=y0+bodyH, botTuckX=reverse?xFront:xBack;
+    p.push(line(botTuckX,yb,botTuckX,yb+tuck,CUT),line(botTuckX,yb+tuck,botTuckX+W,yb+tuck,CUT),line(botTuckX+W,yb+tuck,botTuckX+W,yb,CUT),line(botTuckX,yb,botTuckX+W,yb,CREASE));
+    [xSide1,xSide2].forEach(function(sx){p.push(line(sx,yb,sx,yb+dust,CUT),line(sx,yb+dust,sx+D,yb+dust,CUT),line(sx+D,yb+dust,sx+D,yb,CUT),line(sx,yb,sx+D,yb,CREASE));});
+    p.push(hDim(xBack,y0+bodyH+tuck+6,W,'W '+W+'mm'),hDim(xSide1,y0+bodyH+tuck+12,D,'D '+D+'mm'));
+    p.push('<text x="'+r(x0-8)+'" y="'+r(y0+bodyH/2)+'" '+LBL+' transform="rotate(-90 '+r(x0-8)+' '+r(y0+bodyH/2)+')">H '+H+'mm</text>');
+
+    return wrap(totalW,totalH,{style:spec.style||'straight_tuck_end',width_mm:W,depth_mm:D,height_mm:H,material:spec.material,title:spec.title||'Packaging design'}, p.join(''));
+  };
+
   window.buildDieline = function(spec){
     switch(spec.style){
       case 'reverse_tuck_end': return tuckEnd(spec,true);

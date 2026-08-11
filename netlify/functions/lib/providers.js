@@ -140,6 +140,35 @@ async function cloneVoice({ name, audioBuffer, mime }) {
   return v.voice_id;
 }
 
+/* ---- ElevenLabs: Voice Design — mint a voice from a description ----
+   Used for the preset voice library (grandmother, kid, announcer…). Creates a
+   preview from the description, then saves it as a reusable voice_id. */
+async function designVoice({ name, description, sampleText }) {
+  const gen = await fetch(`${EL_HOST}/v1/text-to-voice/create-previews`, {
+    method: 'POST', headers: { 'xi-api-key': elKey(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ voice_description: description, text: sampleText }),
+  });
+  if (!gen.ok) {
+    const t = (await gen.text()).slice(0, 400);
+    if (gen.status === 401 || /subscription|can_not|permission/i.test(t)) {
+      throw new Error('Voice design needs a paid ElevenLabs plan. Details: ' + t);
+    }
+    throw new Error(`ElevenLabs voice-design ${gen.status}: ${t}`);
+  }
+  const previews = await gen.json();
+  const pick = previews && previews.previews && previews.previews[0];
+  if (!pick || !pick.generated_voice_id) throw new Error('No voice preview generated');
+
+  const save = await fetch(`${EL_HOST}/v1/text-to-voice/create-voice-from-preview`, {
+    method: 'POST', headers: { 'xi-api-key': elKey(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ voice_name: name, voice_description: description, generated_voice_id: pick.generated_voice_id }),
+  });
+  if (!save.ok) throw new Error(`ElevenLabs save-voice ${save.status}: ${(await save.text()).slice(0, 300)}`);
+  const voice = await save.json();
+  if (!voice || !voice.voice_id) throw new Error('No voice_id returned');
+  return { voiceId: voice.voice_id, previewAudio: Buffer.from(pick.audio_base_64 || '', 'base64') };
+}
+
 /* ---- ElevenLabs: Speech-to-Speech (Voice Changer) ----
    Take the client's RECORDED speech and re-render it in the target voice,
    keeping their exact delivery, pacing and emotion. Returns mp3 Buffer. */
@@ -198,6 +227,6 @@ function bufferToDataUrl(buffer, mime) {
 module.exports = {
   MODELS, CORS, json, preflight,
   runFal, falSubmit, falStatus, pickImage, pickVideo,
-  cloneVoice, tts, speechToSpeech,
+  cloneVoice, designVoice, tts, speechToSpeech,
   decodeDataUrl, bufferToDataUrl,
 };

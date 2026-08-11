@@ -142,4 +142,56 @@
 
     return c.toDataURL('image/png');
   };
+
+  // ---- Cinematic / luxury full-bleed post (image fills frame, text overlaid) ----
+  window.renderCinematicPost = async function (o) {
+    var dim = o.size === '1:1' ? [1080, 1080] : o.size === '9:16' ? [1080, 1920] : [1080, 1350];
+    var W = dim[0], H = dim[1];
+    var pal = o.palette === 'terracotta'
+      ? { gold: '#f0cf8f', cream: '#f7eeda' } : { gold: '#e9c877', cream: '#f3ead6' };
+    try {
+      await document.fonts.load('700 80px "Aref Ruqaa"');
+      await document.fonts.load('600 60px "Playfair Display"');
+      await document.fonts.ready;
+    } catch (e) {}
+    var img = await loadImg(o.imageDataUrl);
+    var logo = await loadImg(o.logoDataUrl);
+    var c = document.createElement('canvas'); c.width = W; c.height = H;
+    var ctx = c.getContext('2d');
+    ctx.fillStyle = '#111'; ctx.fillRect(0, 0, W, H);
+    if (img) {
+      var s = Math.max(W / img.width, H / img.height);
+      ctx.drawImage(img, (W - img.width * s) / 2, (H - img.height * s) / 2, img.width * s, img.height * s);
+    }
+    var showText = o.showText !== false && (o.arHeadline || o.enHeadline);
+    if (showText) {
+      var g = ctx.createLinearGradient(0, H * 0.45, 0, H);
+      g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,0.72)');
+      ctx.fillStyle = g; ctx.fillRect(0, H * 0.45, W, H * 0.55);
+      ctx.textAlign = 'left';
+      var pad = Math.round(W * 0.07), y = H - Math.round(W * 0.10);
+      if (o.enHeadline) {
+        ctx.font = '600 ' + Math.round(W * 0.062) + 'px "Playfair Display",serif';
+        ctx.fillStyle = pal.cream; ctx.direction = 'ltr';
+        wrapText(ctx, o.enHeadline, pad, y, W - pad * 2, Math.round(W * 0.07));
+      }
+      if (o.arHeadline) {
+        ctx.font = '700 ' + Math.round(W * 0.075) + 'px "Aref Ruqaa","Amiri",serif';
+        ctx.fillStyle = pal.gold; ctx.direction = 'rtl'; ctx.textAlign = 'right';
+        ctx.fillText(o.arHeadline, W - pad, o.enHeadline ? y - Math.round(W * 0.16) : y);
+        ctx.textAlign = 'left';
+      }
+    }
+    if (logo) medallion(ctx, logo, W - Math.round(W * 0.13), Math.round(W * 0.13), Math.round(W * 0.085), { bg: '#1a1a1a', gold: pal.gold });
+    return c.toDataURL('image/png');
+  };
+  function wrapText(ctx, text, x, y, maxW, lh) {
+    var words = text.split(' '), line = '', lines = [];
+    for (var i = 0; i < words.length; i++) {
+      var t = line + words[i] + ' ';
+      if (ctx.measureText(t).width > maxW && line) { lines.push(line); line = words[i] + ' '; } else line = t;
+    }
+    lines.push(line);
+    for (var j = 0; j < lines.length; j++) ctx.fillText(lines[j].trim(), x, y - (lines.length - 1 - j) * lh);
+  }
 })();

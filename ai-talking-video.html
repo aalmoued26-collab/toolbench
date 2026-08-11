@@ -43,6 +43,24 @@
 
   <div class="panel">
     <p class="panel-label">2 · Voice</p>
+    <label class="field">Ready-made voices</label>
+    <div class="row">
+      <div><select id="tv-preset">
+        <option value="">— choose a preset voice —</option>
+        <option value="ar_grandmother">Arabic Grandmother — warm</option>
+        <option value="ar_grandfather">Arabic Grandfather — wise</option>
+        <option value="ar_boy">Arabic Boy — playful</option>
+        <option value="ar_girl">Arabic Girl — sweet</option>
+        <option value="ar_young_woman">Arabic Young Woman — friendly</option>
+        <option value="ar_young_man">Arabic Young Man — confident</option>
+        <option value="ar_announcer">Arabic Announcer — bold</option>
+        <option value="ar_narrator_f">Arabic Narrator — storyteller</option>
+      </select></div>
+      <div><button class="btn btn-ghost btn-sm" id="tv-preset-go">Create &amp; use</button>
+        <span class="hint" id="tv-presetstatus" style="margin:0;align-self:center"></span></div>
+    </div>
+    <audio id="tv-presetprev" controls style="width:100%;margin:8px 0 4px;display:none"></audio>
+    <div style="height:1px;background:var(--line);margin:14px 0"></div>
     <div class="row">
       <div><label class="field">Use a saved voice</label>
         <select id="tv-voiceSel"><option value="">Default voice</option></select></div>
@@ -134,6 +152,7 @@
   fillChars();
   document.getElementById('tv-charSel').onchange=function(){
     var c=window.TBStore.getCharacter(this.value); var box=document.getElementById('tv-shots'); box.innerHTML='';
+    if(c&&c.voiceId){ voiceId=c.voiceId; var vs=document.getElementById('tv-voiceSel'); if(vs) vs.value=c.voiceId; window.toast('Using '+(c.name||'character')+'’s saved voice'); }
     if(!c||!c.shots){ return; }
     c.shots.forEach(function(s,i){
       var b=document.createElement('button'); b.className='check'; b.style.padding='4px';
@@ -172,6 +191,24 @@
           document.getElementById('tv-voiceSel').value=res.j.voiceId;
           st.textContent='✓ Cloned & saved'; window.toast('Voice saved'); });
     }; r.readAsDataURL(f);
+  };
+
+  // ---- preset voices (Voice Design) ----
+  document.getElementById('tv-preset-go').onclick=function(){
+    var preset=document.getElementById('tv-preset').value; if(!preset){window.toast('Choose a preset voice');return;}
+    var label=document.getElementById('tv-preset').selectedOptions[0].textContent;
+    var st=document.getElementById('tv-presetstatus'), btn=this;
+    btn.disabled=true; st.textContent='Creating voice… 10–30s.';
+    fetch('/api/voice-design',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({preset:preset})})
+      .then(function(x){return x.json().then(function(j){return {ok:x.ok,j:j};});})
+      .then(function(res){ btn.disabled=false;
+        if(!res.ok){st.textContent=res.j.error||'Failed'; window.toast(res.j.error||'Voice failed'); return;}
+        voiceId=res.j.voiceId;
+        window.TBStore.saveVoice({name:res.j.name||label,voiceId:res.j.voiceId,language:res.j.language||'ar'}); fillVoices();
+        document.getElementById('tv-voiceSel').value=res.j.voiceId;
+        if(res.j.previewDataUrl){ var a=document.getElementById('tv-presetprev'); a.src=res.j.previewDataUrl; a.style.display=''; }
+        st.textContent='✓ Ready & saved'; window.toast('Voice ready');
+      }).catch(function(err){btn.disabled=false; st.textContent=String(err); window.toast('Network error');});
   };
 
   // ---- mode + sub tabs ----

@@ -65,6 +65,30 @@
     <p class="hint">“Full set” makes a front portrait, three-quarter, full body, side and back view — plus an action shot if you filled “doing what”. Change the outfit and run it again to restyle.</p>
   </div>
 
+  <div class="panel">
+    <p class="panel-label">3 · Voice <span style="color:var(--faint)">(optional — saved with the character)</span></p>
+    <div class="row">
+      <div><label class="field">Preset voice</label>
+        <select id="ac-preset">
+          <option value="">— choose a voice —</option>
+          <option value="ar_grandmother">Arabic Grandmother — warm</option>
+          <option value="ar_grandfather">Arabic Grandfather — wise</option>
+          <option value="ar_boy">Arabic Boy — playful</option>
+          <option value="ar_girl">Arabic Girl — sweet</option>
+          <option value="ar_young_woman">Arabic Young Woman — friendly</option>
+          <option value="ar_young_man">Arabic Young Man — confident</option>
+          <option value="ar_announcer">Arabic Announcer — bold</option>
+          <option value="ar_narrator_f">Arabic Narrator — storyteller</option>
+        </select></div>
+      <div><button class="btn btn-ghost btn-sm" id="ac-voice-go" style="margin-top:26px">Create &amp; assign</button>
+        <span class="hint" id="ac-voicestatus" style="margin:0"></span></div>
+      <div><label class="field">…or a saved voice</label>
+        <select id="ac-voiceSel"><option value="">— none —</option></select></div>
+    </div>
+    <audio id="ac-voiceprev" controls style="width:100%;margin-top:8px;display:none"></audio>
+    <p class="hint">This voice is stored with the character, so the video tool uses it automatically.</p>
+  </div>
+
   <div class="panel" id="ac-resultPanel" style="display:none">
     <p class="panel-label">Character shots</p>
     <div id="ac-gallery" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px"></div>
@@ -119,6 +143,28 @@
 
   var _sp=document.getElementById('ac-scenePreset');
   if(_sp) _sp.onchange=function(){ if(_sp.value) document.getElementById('ac-scene').value=_sp.value; };
+
+  // ---- character voice ----
+  var voiceId=null, voiceName=null;
+  function fillVoices(){ var sel=document.getElementById('ac-voiceSel'); var list=window.TBStore.listVoices();
+    sel.innerHTML='<option value="">— none —</option>'+list.map(function(v){return '<option value="'+v.voiceId+'">'+(v.name||'Voice')+'</option>';}).join(''); }
+  fillVoices();
+  document.getElementById('ac-voiceSel').onchange=function(){ voiceId=this.value||null; voiceName=this.selectedOptions[0]?this.selectedOptions[0].textContent:null; };
+  document.getElementById('ac-voice-go').onclick=function(){
+    var preset=document.getElementById('ac-preset').value; if(!preset){window.toast('Choose a preset voice');return;}
+    var label=document.getElementById('ac-preset').selectedOptions[0].textContent;
+    var st=document.getElementById('ac-voicestatus'), btn=this; btn.disabled=true; st.textContent='Creating… 10–30s.';
+    fetch('/api/voice-design',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({preset:preset})})
+      .then(function(x){return x.json().then(function(j){return {ok:x.ok,j:j};});})
+      .then(function(res){ btn.disabled=false;
+        if(!res.ok){st.textContent=res.j.error||'Failed'; window.toast(res.j.error||'Voice failed'); return;}
+        voiceId=res.j.voiceId; voiceName=res.j.name||label;
+        window.TBStore.saveVoice({name:voiceName,voiceId:voiceId,language:res.j.language||'ar'}); fillVoices();
+        document.getElementById('ac-voiceSel').value=voiceId;
+        if(res.j.previewDataUrl){var a=document.getElementById('ac-voiceprev');a.src=res.j.previewDataUrl;a.style.display='';}
+        st.textContent='✓ Assigned'; window.toast('Voice assigned'); })
+      .catch(function(err){btn.disabled=false; st.textContent=String(err);});
+  };
 
   function fields(){
     return { outfit:document.getElementById('ac-outfit').value.trim(),
@@ -184,7 +230,7 @@
     var name=document.getElementById('ac-name').value.trim()||'Untitled character';
     window.TBStore.saveCharacter({ name:name, thumb:thumb||shots[0].url, shots:shots.slice(),
       outfit:document.getElementById('ac-outfit').value.trim(),
-      scene:document.getElementById('ac-scene').value.trim(), voiceId:null });
+      scene:document.getElementById('ac-scene').value.trim(), voiceId:voiceId, voiceName:voiceName });
     document.getElementById('ac-savestatus').textContent='✓ Saved';
     window.toast('Character saved on this device'); renderSaved();
   };
@@ -213,6 +259,8 @@
         document.getElementById('ac-name').value=c.name||'';
         document.getElementById('ac-outfit').value=c.outfit||'';
         document.getElementById('ac-scene').value=c.scene||'';
+        voiceId=c.voiceId||null; voiceName=c.voiceName||null;
+        if(voiceId){ var vs=document.getElementById('ac-voiceSel'); vs.value=voiceId; }
         window.toast('Loaded '+(c.name||'character'));
         window.scrollTo({top:0,behavior:'smooth'});
       };
