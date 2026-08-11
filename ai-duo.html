@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Two-Character Scene — Toolbench</title>
+<meta name="description" content="Put two of your saved AI characters together in one realistic photo or video — same faces, one scene. Free.">
+<link rel="canonical" href="https://mytoolbench.co/ai-duo">
+<meta name="robots" content="index,follow">
+<meta property="og:title" content="AI Two-Character Scene — Toolbench">
+<meta property="og:description" content="Two characters together in one realistic photo or video. Free.">
+<meta property="og:url" content="https://mytoolbench.co/ai-duo">
+<meta property="og:site_name" content="Toolbench">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='4' y='4' width='24' height='24' rx='6' fill='none' stroke='%2316171B' stroke-width='3'/><rect x='11' y='11' width='10' height='10' rx='2' fill='%232B41D8'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"AI Two-Character Scene","url":"https://mytoolbench.co/ai-duo.html","applicationCategory":"MultimediaApplication","operatingSystem":"Any (web browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
+</head>
+<body>
+<div id="site-header"></div>
+
+<main class="wrap page">
+  <p class="crumb"><a href="index.html">Toolbench</a> &nbsp;/&nbsp; AI Studio &nbsp;/&nbsp; AI Two-Character Scene</p>
+  <div class="tool-head rise"><span class="chip">AI Studio · Free</span></div>
+  <h1 class="title rise d1">AI Two-Character Scene</h1>
+  <p class="subtitle rise d2">Put two of your saved characters together in one realistic scene — same faces — then animate it into a short clip.</p>
+
+  <div class="rise d3">
+  <div class="panel">
+    <p class="panel-label">1 · Pick two characters</p>
+    <div class="row">
+      <div>
+        <label class="field">Character A</label>
+        <select id="du-a"><option value="">— saved character —</option></select>
+        <div id="du-ashots" class="checks" style="margin-top:8px"></div>
+      </div>
+      <div>
+        <label class="field">Character B</label>
+        <select id="du-b"><option value="">— saved character —</option></select>
+        <div id="du-bshots" class="checks" style="margin-top:8px"></div>
+      </div>
+    </div>
+    <p class="hint">Build and save characters in the <a href="ai-character.html">Character Studio</a> first. Click a shot under each to choose the face to use.</p>
+  </div>
+
+  <div class="panel">
+    <p class="panel-label">2 · Scene &amp; action</p>
+    <div class="row">
+      <div><label class="field">What are they doing together?</label><input type="text" id="du-action" placeholder="e.g. cooking samosas together, laughing at the table"></div>
+      <div><label class="field">Background</label>
+        <select id="du-scene">
+          <option value="">— choose —</option>
+          <option value="a traditional antique Arabic kitchen, copper pots, warm golden light">Antique Arabic kitchen</option>
+          <option value="an Andalusian-style house with arches and zellige tiles, warm daylight">Andalusian house</option>
+          <option value="a traditional Gulf majlis with patterned cushions and brass coffee pots">Traditional majlis</option>
+          <option value="a rustic old-world kitchen with warm window light">Rustic kitchen</option>
+          <option value="clean studio with soft light">Clean studio</option>
+        </select></div>
+      <div><label class="field">Shape</label>
+        <select id="du-aspect"><option value="4:5">Portrait (4:5)</option><option value="1:1">Square</option><option value="16:9">Wide</option><option value="9:16">Story</option></select></div>
+    </div>
+    <div class="controls">
+      <button class="btn btn-primary" id="du-make">Generate together</button>
+      <span class="hint" id="du-status" style="margin:0;align-self:center"></span>
+    </div>
+  </div>
+
+  <div class="panel" id="du-resultPanel" style="display:none">
+    <p class="panel-label">Both characters together</p>
+    <img id="du-result" alt="Two characters" style="width:100%;max-width:520px;border:1px solid var(--line);border-radius:10px;background:#fff">
+    <div class="controls">
+      <a class="btn btn-ghost btn-sm" id="du-download" download="two-characters.png">Download image</a>
+      <button class="btn btn-primary btn-sm" id="du-animate">Animate together (short clip)</button>
+      <span class="hint" id="du-vstatus" style="margin:0;align-self:center"></span>
+    </div>
+    <video id="du-video" controls playsinline style="width:100%;max-width:520px;border:1px solid var(--line);border-radius:10px;background:#000;margin-top:12px;display:none"></video>
+    <div class="controls" id="du-vdl" style="display:none"><a class="btn btn-ghost btn-sm" id="du-vdownload" download="two-characters.mp4">Download video</a></div>
+  </div>
+  </div>
+
+  <div class="ad-slot"><div class="ph">AD SLOT &mdash; add your AdSense code here</div></div>
+  <section class="prose" style="margin-top:40px">
+    <h2>About the two-character scene tool</h2>
+    <p>Choose two characters you built in the Character Studio and the tool composes them into one photorealistic scene together, keeping each face recognizable. You can then animate the scene into a short clip. Great for a grandmother and granddaughter cooking, a founder and a customer, or any pairing.</p>
+    <p>Free to use. Note: putting two AI faces in one shot is harder than one — pick clear front-facing shots for the best likeness, and expect the still image to hold identity better than the animated clip.</p>
+  </section>
+</main>
+<div id="site-footer"></div>
+<script src="app.js"></script>
+<script src="tb-store.js"></script>
+<script>
+(function(){
+  var imgA=null, imgB=null, comboUrl=null;
+  function fill(sel){ var list=window.TBStore.listCharacters();
+    sel.innerHTML='<option value="">— saved character —</option>'+list.map(function(c){return '<option value="'+c.id+'">'+(c.name||'Character')+'</option>';}).join(''); }
+  fill(document.getElementById('du-a')); fill(document.getElementById('du-b'));
+
+  function wire(selId, boxId, set){
+    document.getElementById(selId).onchange=function(){
+      var c=window.TBStore.getCharacter(this.value); var box=document.getElementById(boxId); box.innerHTML='';
+      if(!c||!c.shots)return;
+      c.shots.forEach(function(s,i){
+        var btn=document.createElement('button'); btn.className='check'; btn.style.padding='4px';
+        btn.innerHTML='<img src="'+s.url+'" style="width:60px;height:60px;object-fit:cover;border-radius:6px">';
+        btn.onclick=function(){ set(s.url); box.querySelectorAll('button').forEach(function(x){x.classList.remove('on');}); btn.classList.add('on'); };
+        box.appendChild(btn); if(i===0) btn.click();
+      });
+    };
+  }
+  wire('du-a','du-ashots',function(u){imgA=u;});
+  wire('du-b','du-bshots',function(u){imgB=u;});
+
+  document.getElementById('du-make').onclick=function(){
+    if(!imgA||!imgB){window.toast('Pick a shot for both characters');return;}
+    var st=document.getElementById('du-status'), btn=this;
+    btn.disabled=true; st.textContent='Composing them together… 20–60s.';
+    fetch('/api/combine',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ imageA:imgA, imageB:imgB, action:document.getElementById('du-action').value.trim(),
+        scene:document.getElementById('du-scene').value, aspect:document.getElementById('du-aspect').value })})
+      .then(function(x){return x.json().then(function(j){return {ok:x.ok,j:j};});})
+      .then(function(res){ btn.disabled=false; st.textContent='';
+        if(!res.ok){st.textContent=res.j.error||'Failed'; window.toast(res.j.error||'Failed'); return;}
+        comboUrl=res.j.imageUrl; document.getElementById('du-result').src=comboUrl;
+        document.getElementById('du-download').href=comboUrl;
+        document.getElementById('du-resultPanel').style.display=''; window.toast('Scene ready');
+      }).catch(function(err){btn.disabled=false; st.textContent=String(err); window.toast('Network error');});
+  };
+
+  function poll(model, requestId, st, done){
+    var tries=0; var iv=setInterval(function(){ tries++;
+      fetch('/api/generate-status',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:model,requestId:requestId})})
+        .then(function(x){return x.json();})
+        .then(function(j){ if(j.status==='done'){clearInterval(iv);done(null,j.videoUrl);}
+          else if(j.status==='failed'||j.error){clearInterval(iv);done(new Error(j.error||'Failed'));}
+          else { st.textContent='Rendering… ('+(tries*5)+'s)'; if(tries>=90){clearInterval(iv);done(new Error('Timed out'));} } })
+        .catch(function(){}); },5000);
+  }
+  document.getElementById('du-animate').onclick=function(){
+    if(!comboUrl){window.toast('Generate the image first');return;}
+    var st=document.getElementById('du-vstatus'), btn=this;
+    btn.disabled=true; st.textContent='Starting…';
+    fetch('/api/generate-start',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ mode:'action', characterImageUrl:comboUrl,
+        action:document.getElementById('du-action').value.trim(), scene:document.getElementById('du-scene').value })})
+      .then(function(x){return x.json().then(function(j){return {ok:x.ok,j:j};});})
+      .then(function(res){ if(!res.ok){btn.disabled=false; st.textContent=res.j.error||'Failed'; return;}
+        st.textContent='Rendering… (1–3 min)';
+        poll(res.j.model,res.j.requestId,st,function(err,url){ btn.disabled=false;
+          if(err){st.textContent=String(err.message||err); window.toast(String(err.message||err)); return;}
+          st.textContent='Done'; var v=document.getElementById('du-video'); v.src=url; v.style.display='';
+          document.getElementById('du-vdownload').href=url; document.getElementById('du-vdl').style.display=''; window.toast('Clip ready');
+        });
+      }).catch(function(err){btn.disabled=false; st.textContent=String(err); window.toast('Network error');});
+  };
+})();
+</script>
+</body>
+</html>
