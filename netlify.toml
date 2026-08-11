@@ -1,11 +1,10 @@
 # Toolbench — Netlify config (Git-based deploy)
-# Functions live in the top-level "functions" folder (clean, no duplicates).
-# The old netlify/functions folder is intentionally NOT used, so any stray or
-# badly-named leftover files there are ignored and cannot break the build.
+# Netlify builds from the repo, bundles the functions in netlify/functions,
+# and publishes the repo root as the site.
 
 [build]
   publish = "."
-  functions = "functions"
+  functions = "netlify/functions"
 
 [functions]
   node_bundler = "esbuild"
