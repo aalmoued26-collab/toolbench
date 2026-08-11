@@ -45,11 +45,12 @@ exports.handler = async (event) => {
 
     // action: image -> short cinematic motion clip
     const prompt =
-      (b.action ? `The person is ${b.action}. ` : '') +
+      (b.action ? `${b.action}. ` : '') +
       (b.scene ? `Setting: ${b.scene}. ` : '') +
-      'Natural realistic motion, subtle camera movement, cinematic, high detail, photorealistic.';
+      'Natural realistic motion, lifelike faces, gentle handheld camera movement, cinematic, high detail, photorealistic.';
     const requestId = await P.falSubmit(P.MODELS.video, {
-      image_url: b.characterImageUrl, prompt, duration: 5,
+      image_url: b.characterImageUrl, prompt,
+      duration: b.duration === '10' ? '10' : '5',
     });
     return P.json(200, { requestId, model: P.MODELS.video });
   } catch (err) {

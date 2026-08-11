@@ -88,11 +88,12 @@
   </div>
 
   <div class="panel" id="du-resultPanel" style="display:none">
-    <p class="panel-label">Both characters together</p>
+    <p class="panel-label">Step A — the keyframe photo (this is the first frame of your video, not the final clip)</p>
     <img id="du-result" alt="Two characters" style="width:100%;max-width:520px;border:1px solid var(--line);border-radius:10px;background:#fff">
+    <p class="hint" style="margin-top:10px"><b>This is a still.</b> Press the button below to turn it into the moving vlog video.</p>
     <div class="controls">
-      <a class="btn btn-ghost btn-sm" id="du-download" download="two-characters.png">Download image</a>
-      <button class="btn btn-primary btn-sm" id="du-animate">Animate together (short clip)</button>
+      <button class="btn btn-primary" id="du-animate">▶ Make the vlog video</button>
+      <a class="btn btn-ghost btn-sm" id="du-download" download="two-characters.png">Download the still</a>
       <span class="hint" id="du-vstatus" style="margin:0;align-self:center"></span>
     </div>
     <video id="du-video" controls playsinline style="width:100%;max-width:520px;border:1px solid var(--line);border-radius:10px;background:#000;margin-top:12px;display:none"></video>
@@ -254,7 +255,7 @@
     var framing=document.getElementById('du-framing').value;
     var baseAction=document.getElementById('du-action').value.trim();
     var motion = framing==='selfie'
-      ? ('a handheld selfie vlog: the person holding the phone talks to camera then the shot turns toward the other person who is talking, natural head and mouth movement, lively social-media energy'
+      ? ('Handheld selfie-camera vlog recorded on a phone: the person looks into the lens and talks to camera with natural mouth and head movement, the other person leans in and reacts, gentle handheld sway, lively social-media energy'
          + (baseAction ? ', while '+baseAction : ''))
       : baseAction;
     btn.disabled=true; st.textContent='Starting…';

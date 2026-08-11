@@ -25,7 +25,7 @@ const MODELS = {
   talking:   process.env.FAL_MODEL_TALKING   || 'fal-ai/veed/fabric-1.0',
   // Image -> short motion clip (action / vlog animation). THIS was missing,
   // which caused "model not allowed: undefined" on Animate.
-  video:     process.env.FAL_MODEL_VIDEO     || 'fal-ai/kling-video/v2/standard/image-to-video',
+  video:     process.env.FAL_MODEL_VIDEO     || 'fal-ai/kling-video/v2.1/standard/image-to-video',
   // Fast image-EDIT model for packaging: wraps the uploaded artwork onto a
   // realistic package while keeping the logo/colours/layout faithful.
   packEdit:  process.env.FAL_MODEL_PACK_EDIT || 'fal-ai/nano-banana/edit',

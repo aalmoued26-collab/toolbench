@@ -15,7 +15,7 @@ exports.handler = async (event) => {
     if (!b.imageA || !b.imageB) return P.json(400, { error: 'imageA and imageB are required' });
 
     var framing = {
-      selfie: 'Shot as a POV selfie / vlog: one of them holds the phone at arm\'s length, both faces visible, casual social-media selfie framing, slight wide-angle. ',
+      selfie: 'Framed exactly like a front-facing phone selfie CAMERA view — as if we are watching the video the phone is recording: one person holds the phone and looks straight into the lens talking to camera, the other leans in beside them, both faces close and clearly visible, slightly high selfie angle, mild wide-angle lens, vertical social-media vlog look. ',
       overshoulder: 'Over-the-shoulder framing, cinematic and candid. ',
       twoshot: 'A clean two-shot with both people nicely framed side by side. '
     }[b.framing] || '';
