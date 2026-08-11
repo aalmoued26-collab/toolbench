@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Packaging Mockup &amp; Dieline — Toolbench</title>
+<meta name="description" content="Upload your branding to generate a print-ready dieline with real mm sizes and a photorealistic packaging mockup. Free.">
+<link rel="canonical" href="https://mytoolbench.co/ai-packaging">
+<meta name="robots" content="index,follow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="AI Packaging Mockup & Dieline — Toolbench">
+<meta property="og:description" content="Branding in, dieline + realistic mockup out. Free.">
+<meta property="og:url" content="https://mytoolbench.co/ai-packaging">
+<meta property="og:site_name" content="Toolbench">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='4' y='4' width='24' height='24' rx='6' fill='none' stroke='%2316171B' stroke-width='3'/><rect x='11' y='11' width='10' height='10' rx='2' fill='%232B41D8'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"AI Packaging Mockup & Dieline","url":"https://mytoolbench.co/ai-packaging.html","applicationCategory":"DesignApplication","operatingSystem":"Any (web browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
+</head>
+<body>
+<div id="site-header"></div>
+
+<main class="wrap page">
+  <p class="crumb"><a href="index.html">Toolbench</a> &nbsp;/&nbsp; AI Studio &nbsp;/&nbsp; AI Packaging Mockup</p>
+  <div class="tool-head rise"><span class="chip">AI Studio · Free</span></div>
+  <h1 class="title rise d1">AI Packaging Mockup &amp; Dieline</h1>
+  <p class="subtitle rise d2">Upload your branding, set the box size, and get a print-ready dieline (to real millimetres) plus a photorealistic 3D mockup.</p>
+
+  <div class="rise d3">
+  <div class="panel">
+    <p class="panel-label">1 · Branding &amp; colours <span style="color:var(--faint)">(optional)</span></p>
+    <input type="file" id="pk-file" accept="image/*" style="padding:10px">
+    <p class="hint">Upload a logo or existing design. Colours are read from it in your browser to build the palette.</p>
+    <div id="pk-swatches" class="checks" style="margin-top:12px"></div>
+  </div>
+
+  <div class="panel">
+    <p class="panel-label">2 · Box &amp; size</p>
+    <div class="row">
+      <div><label class="field">Product name</label><input type="text" id="pk-name" placeholder="e.g. Organic Honey 250g"></div>
+      <div><label class="field">Box style</label>
+        <select id="pk-style">
+          <option value="straight_tuck_end">Straight tuck-end carton</option>
+          <option value="reverse_tuck_end">Reverse tuck-end carton</option>
+          <option value="sleeve">Sleeve</option>
+          <option value="pillow_box">Pillow box</option>
+        </select></div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <div><label class="field">Width (mm)</label><input type="number" id="pk-w" value="80"></div>
+      <div><label class="field">Depth (mm)</label><input type="number" id="pk-d" value="40"></div>
+      <div><label class="field">Height (mm)</label><input type="number" id="pk-h" value="150"></div>
+      <div><label class="field">Finish</label>
+        <select id="pk-finish"><option>matte laminate</option><option>gloss laminate</option><option>soft-touch matte</option><option>matte with spot UV</option><option>gold foil accents</option></select></div>
+    </div>
+    <div class="controls">
+      <button class="btn btn-ghost" id="pk-dieline">Generate dieline</button>
+      <button class="btn btn-primary" id="pk-mockup">Generate 3D mockup</button>
+      <span class="hint" id="pk-status" style="margin:0;align-self:center"></span>
+    </div>
+  </div>
+
+  <div class="panel" id="pk-diePanel" style="display:none">
+    <p class="panel-label">Print-ready dieline (1:1 mm)</p>
+    <div id="pk-dieView" style="overflow:auto;border:1px solid var(--line);border-radius:10px;background:#fff;padding:10px"></div>
+    <div class="controls"><a class="btn btn-ghost btn-sm" id="pk-dieDownload" download="dieline.svg">Download SVG</a>
+      <span class="hint" style="margin:0;align-self:center">Magenta = cut · blue dashed = fold · grey = 3&nbsp;mm bleed</span></div>
+  </div>
+
+  <div class="panel" id="pk-mockPanel" style="display:none">
+    <p class="panel-label">Photorealistic mockup</p>
+    <img id="pk-mockImg" alt="Packaging mockup" style="width:100%;max-width:520px;border:1px solid var(--line);border-radius:10px;background:#fff">
+    <div class="controls"><a class="btn btn-ghost btn-sm" id="pk-mockDownload" download="mockup.png">Download mockup</a></div>
+  </div>
+  </div>
+
+  <div class="ad-slot"><div class="ph">AD SLOT &mdash; add your AdSense code here</div></div>
+  <section class="prose" style="margin-top:40px">
+    <h2>About the packaging mockup &amp; dieline tool</h2>
+    <p>Set your box style and dimensions and the tool draws a print-ready dieline to exact millimetres &mdash; cut lines, fold creases and a 3&nbsp;mm bleed &mdash; right in your browser, so it&rsquo;s instant and free. Then generate a photorealistic 3D mockup of the finished box in your brand colours to show clients or use in listings.</p>
+    <p>The dieline is a starting template; always confirm final cutter specs with your printer before production.</p>
+  </section>
+</main>
+<div id="site-footer"></div>
+<script src="app.js"></script>
+<script src="dielines.js"></script>
+<script>
+(function(){
+  var colors=['#2B41D8','#16171B'], artworkData=null;
+  document.getElementById('pk-file').onchange=function(e){
+    var f=e.target.files[0]; if(!f)return;
+    var r=new FileReader();
+    r.onload=function(){
+      artworkData=r.result;
+      var im=new Image();
+      im.onload=function(){
+        try{ colors=window.extractPalette(im,5); }catch(_){}
+        var box=document.getElementById('pk-swatches'); box.innerHTML='';
+        colors.forEach(function(hex){
+          var s=document.createElement('span'); s.className='check';
+          s.innerHTML='<span style="width:16px;height:16px;border-radius:4px;display:inline-block;background:'+hex+';border:1px solid #0002"></span>'+hex;
+          box.appendChild(s);
+        });
+      };
+      im.src=r.result;
+    };
+    r.readAsDataURL(f);
+  };
+  function spec(){
+    return { style:document.getElementById('pk-style').value,
+      width_mm:+document.getElementById('pk-w').value||80,
+      depth_mm:+document.getElementById('pk-d').value||40,
+      height_mm:+document.getElementById('pk-h').value||150,
+      material:document.getElementById('pk-finish').value,
+      title:(document.getElementById('pk-name').value||'Package')+' — '+document.getElementById('pk-style').value };
+  }
+  document.getElementById('pk-dieline').onclick=function(){
+    var svg=window.buildDieline(spec());
+    document.getElementById('pk-dieView').innerHTML=svg;
+    var sv=document.getElementById('pk-dieView').querySelector('svg');
+    if(sv){sv.style.maxWidth='100%'; sv.style.height='auto';}
+    var blob=new Blob([svg],{type:'image/svg+xml'});
+    document.getElementById('pk-dieDownload').href=URL.createObjectURL(blob);
+    document.getElementById('pk-diePanel').style.display='';
+    window.toast('Dieline ready');
+  };
+  document.getElementById('pk-mockup').onclick=function(){
+    var st=document.getElementById('pk-status'), btn=this;
+    btn.disabled=true; st.textContent='Rendering mockup… 20–60 seconds.';
+    fetch('/api/packaging-mockup',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ boxStyle:document.getElementById('pk-style').value,
+        productName:document.getElementById('pk-name').value, colors:colors,
+        finish:document.getElementById('pk-finish').value })})
+      .then(function(x){return x.json().then(function(j){return {ok:x.ok,j:j};});})
+      .then(function(res){ btn.disabled=false; st.textContent='';
+        if(!res.ok){st.textContent=res.j.error||'Failed'; window.toast(res.j.error||'Mockup failed'); return;}
+        document.getElementById('pk-mockImg').src=res.j.imageUrl;
+        document.getElementById('pk-mockDownload').href=res.j.imageUrl;
+        document.getElementById('pk-mockPanel').style.display=''; window.toast('Mockup ready');
+      })
+      .catch(function(err){btn.disabled=false; st.textContent=String(err); window.toast('Network error');});
+  };
+})();
+</script>
+</body>
+</html>

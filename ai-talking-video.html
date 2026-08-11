@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Talking Character Video — Toolbench</title>
+<meta name="description" content="Record your voice, convert it to your chosen voice, and put it on a realistic talking character video. Arabic supported. Free.">
+<link rel="canonical" href="https://mytoolbench.co/ai-talking-video">
+<meta name="robots" content="index,follow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="AI Talking Character Video — Toolbench">
+<meta property="og:description" content="Record your voice, convert it, get a realistic talking video. Free.">
+<meta property="og:url" content="https://mytoolbench.co/ai-talking-video">
+<meta property="og:site_name" content="Toolbench">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='4' y='4' width='24' height='24' rx='6' fill='none' stroke='%2316171B' stroke-width='3'/><rect x='11' y='11' width='10' height='10' rx='2' fill='%232B41D8'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"AI Talking Character Video","url":"https://mytoolbench.co/ai-talking-video.html","applicationCategory":"MultimediaApplication","operatingSystem":"Any (web browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
+</head>
+<body>
+<div id="site-header"></div>
+
+<main class="wrap page">
+  <p class="crumb"><a href="index.html">Toolbench</a> &nbsp;/&nbsp; AI Studio &nbsp;/&nbsp; AI Talking Character Video</p>
+  <div class="tool-head rise"><span class="chip">AI Studio · Free</span></div>
+  <h1 class="title rise d1">AI Talking Character Video</h1>
+  <p class="subtitle rise d2">Record yourself speaking, convert your recording into your chosen voice, and put it on a realistic character whose mouth matches every word. Arabic and other languages supported.</p>
+
+  <div class="rise d3">
+  <div class="panel">
+    <p class="panel-label">1 · Character image</p>
+    <input type="file" id="tv-imgfile" accept="image/*" style="padding:10px">
+    <p class="hint">Use a face photo, or a character from the <a href="ai-character.html">AI Character Generator</a>.</p>
+    <div id="tv-imgprev" style="margin-top:14px;display:none"><img id="tv-img" alt="Character" style="max-height:150px;border:1px solid var(--line);border-radius:8px;background:#fff"></div>
+  </div>
+
+  <div class="panel">
+    <p class="panel-label">2 · Your voice</p>
+    <label class="field">Upload a voice sample to clone (30–60s of clear speech). The character will speak in this voice.</label>
+    <input type="file" id="tv-voicefile" accept="audio/*" style="padding:10px">
+    <div class="controls">
+      <button class="btn btn-ghost btn-sm" id="tv-clone">Clone this voice</button>
+      <span class="hint" id="tv-voicestatus" style="margin:0;align-self:center"></span>
+    </div>
+    <p class="hint">Cloning uses ElevenLabs (needs the site owner’s paid plan). Leave blank to use the default voice.</p>
+  </div>
+
+  <div class="panel">
+    <p class="panel-label">3 · What the character says</p>
+    <div class="checks" style="margin-bottom:14px">
+      <label class="check on" id="tv-tab-rec"><input type="radio" name="tvmode" value="record" checked> Record my voice</label>
+      <label class="check" id="tv-tab-type"><input type="radio" name="tvmode" value="type"> Type text</label>
+    </div>
+
+    <div id="tv-recordPane">
+      <p class="hint" style="margin-top:0">Speak the line yourself — your delivery, pace and emotion are kept, then converted into the voice above (Voice Changer). This is the most realistic option.</p>
+      <div class="controls">
+        <button class="btn btn-primary btn-sm" id="tv-rec">● Record</button>
+        <button class="btn btn-ghost btn-sm" id="tv-stop" disabled>■ Stop</button>
+        <span class="hint" id="tv-rectime" style="margin:0;align-self:center"></span>
+      </div>
+      <p class="hint">…or upload a recording instead: <input type="file" id="tv-recfile" accept="audio/*" style="padding:6px"></p>
+      <audio id="tv-recprev" controls style="width:100%;margin-top:8px;display:none"></audio>
+    </div>
+
+    <div id="tv-typePane" style="display:none">
+      <textarea id="tv-script" placeholder="اكتب ما تريد أن تقوله الشخصية…  (Type what the character should say.)"></textarea>
+      <div class="row" style="margin-top:12px">
+        <div><label class="field">Language</label>
+          <select id="tv-lang"><option value="ar">Arabic</option><option value="en">English</option><option value="fr">French</option><option value="es">Spanish</option><option value="">Auto</option></select></div>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:12px">
+      <div><label class="field">Quality</label>
+        <select id="tv-res"><option value="480p">Standard (480p)</option><option value="720p">High (720p)</option></select></div>
+    </div>
+    <div class="controls">
+      <button class="btn btn-primary" id="tv-go">Generate talking video</button>
+      <span class="hint" id="tv-status" style="margin:0;align-self:center"></span>
+    </div>
+  </div>
+
+  <div class="panel" id="tv-resultPanel" style="display:none">
+    <p class="panel-label">Your video</p>
+    <video id="tv-result" controls playsinline style="width:100%;max-width:520px;border:1px solid var(--line);border-radius:10px;background:#000"></video>
+    <div class="controls"><a class="btn btn-ghost btn-sm" id="tv-download" download="talking-video.mp4">Download video</a></div>
+  </div>
+  </div>
+
+  <div class="ad-slot"><div class="ph">AD SLOT &mdash; add your AdSense code here</div></div>
+  <section class="prose" style="margin-top:40px">
+    <h2>About the talking character video tool</h2>
+    <p>Record yourself performing the line, and the tool converts your recording into your chosen voice while keeping your exact timing, pauses and emotion (this is voice-to-voice conversion, not flat text reading). It then animates the character so the lips match the audio. Prefer typing? Switch to “Type text” and the voice reads your script instead. Arabic and many other languages are supported.</p>
+    <p>It’s free to use. Audio and images are sent to the AI services only to produce your video and are not stored by Toolbench.</p>
+  </section>
+</main>
+<div id="site-footer"></div>
+<script src="app.js"></script>
+<script>
+(function(){
+  var imgData=null, voiceId=null, recordedData=null, mode='record';
+
+  // ---- character image ----
+  document.getElementById('tv-imgfile').onchange=function(e){
+    var f=e.target.files[0]; if(!f)return;
+    if(f.size>6*1024*1024){window.toast('Please choose an image under 6 MB');return;}
+    var r=new FileReader(); r.onload=function(){imgData=r.result;
+      document.getElementById('tv-img').src=imgData; document.getElementById('tv-imgprev').style.display='';};
+    r.readAsDataURL(f);
+  };
+
+  // ---- clone voice ----
+  document.getElementById('tv-clone').onclick=function(){
+    var f=document.getElementById('tv-voicefile').files[0];
+    if(!f){window.toast('Choose a voice file first');return;}
+    if(f.size>8*1024*1024){window.toast('Please choose an audio file under 8 MB');return;}
+    var st=document.getElementById('tv-voicestatus'), btn=this;
+    var r=new FileReader();
+    r.onload=function(){
+      btn.disabled=true; st.textContent='Cloning voice…';
+      fetch('/api/voice-clone',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({audioDataUrl:r.result,name:f.name})})
+        .then(function(x){return x.json().then(function(j){return {ok:x.ok,j:j};});})
+        .then(function(res){ btn.disabled=false;
+          if(!res.ok){st.textContent=res.j.error||'Clone failed'; window.toast('Voice clone failed'); return;}
+          voiceId=res.j.voiceId; st.textContent='✓ Voice ready — the video will use it.'; window.toast('Voice ready');
+        })
+        .catch(function(err){btn.disabled=false; st.textContent=String(err);});
+    };
+    r.readAsDataURL(f);
+  };
+
+  // ---- mode tabs ----
+  function setMode(m){
+    mode=m;
+    document.getElementById('tv-recordPane').style.display = m==='record'?'':'none';
+    document.getElementById('tv-typePane').style.display   = m==='type'?'':'none';
+    document.getElementById('tv-tab-rec').classList.toggle('on', m==='record');
+    document.getElementById('tv-tab-type').classList.toggle('on', m==='type');
+  }
+  document.getElementById('tv-tab-rec').onclick=function(){setMode('record');};
+  document.getElementById('tv-tab-type').onclick=function(){setMode('type');};
+
+  // ---- in-browser recording ----
+  var mediaRec=null, chunks=[], timer=null, secs=0;
+  var recBtn=document.getElementById('tv-rec'), stopBtn=document.getElementById('tv-stop');
+  var recTime=document.getElementById('tv-rectime'), recPrev=document.getElementById('tv-recprev');
+  recBtn.onclick=function(){
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){window.toast('Recording not supported on this browser');return;}
+    navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+      chunks=[]; mediaRec=new MediaRecorder(stream);
+      mediaRec.ondataavailable=function(e){ if(e.data.size) chunks.push(e.data); };
+      mediaRec.onstop=function(){
+        var blob=new Blob(chunks,{type:mediaRec.mimeType||'audio/webm'});
+        var r=new FileReader(); r.onload=function(){ recordedData=r.result; recPrev.src=recordedData; recPrev.style.display=''; };
+        r.readAsDataURL(blob);
+        stream.getTracks().forEach(function(t){t.stop();});
+      };
+      mediaRec.start(); secs=0; recTime.textContent='0:00 — recording…';
+      timer=setInterval(function(){secs++; recTime.textContent=Math.floor(secs/60)+':'+('0'+(secs%60)).slice(-2)+' — recording…';},1000);
+      recBtn.disabled=true; stopBtn.disabled=false;
+    }).catch(function(){window.toast('Microphone permission denied');});
+  };
+  stopBtn.onclick=function(){ if(mediaRec&&mediaRec.state!=='inactive') mediaRec.stop();
+    clearInterval(timer); recTime.textContent='Recorded ✓'; recBtn.disabled=false; stopBtn.disabled=true; };
+  document.getElementById('tv-recfile').onchange=function(e){
+    var f=e.target.files[0]; if(!f)return;
+    if(f.size>10*1024*1024){window.toast('Please choose an audio file under 10 MB');return;}
+    var r=new FileReader(); r.onload=function(){ recordedData=r.result; recPrev.src=recordedData; recPrev.style.display=''; recTime.textContent='Uploaded ✓'; };
+    r.readAsDataURL(f);
+  };
+
+  // ---- generate ----
+  document.getElementById('tv-go').onclick=function(){
+    if(!imgData){window.toast('Add a character image first');return;}
+    var body={ imageUrl:imgData, voiceId:voiceId, resolution:document.getElementById('tv-res').value };
+    if(mode==='record'){
+      if(!recordedData){window.toast('Record or upload your voice first');return;}
+      body.sourceAudioDataUrl=recordedData;
+    } else {
+      var script=document.getElementById('tv-script').value.trim();
+      if(!script){window.toast('Type a script first');return;}
+      body.script=script; body.language=document.getElementById('tv-lang').value;
+    }
+    var st=document.getElementById('tv-status'), btn=this;
+    btn.disabled=true; st.textContent='Generating… this can take 1–3 minutes.';
+    fetch('/api/talking-video',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
+      .then(function(x){return x.json().then(function(j){return {ok:x.ok,j:j};});})
+      .then(function(res){ btn.disabled=false; st.textContent='';
+        if(!res.ok){st.textContent=res.j.error||'Failed'; window.toast(res.j.error||'Generation failed'); return;}
+        var v=document.getElementById('tv-result'); v.src=res.j.videoUrl;
+        document.getElementById('tv-download').href=res.j.videoUrl;
+        document.getElementById('tv-resultPanel').style.display=''; window.toast('Video ready');
+      })
+      .catch(function(err){btn.disabled=false; st.textContent=String(err); window.toast('Network error');});
+  };
+})();
+</script>
+</body>
+</html>

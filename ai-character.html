@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Character Generator — Toolbench</title>
+<meta name="description" content="Upload one photo and generate a consistent, photorealistic AI character for marketing images and video. Free.">
+<link rel="canonical" href="https://mytoolbench.co/ai-character">
+<meta name="robots" content="index,follow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="AI Character Generator — Toolbench">
+<meta property="og:description" content="Upload a photo, get a realistic AI marketing character. Free.">
+<meta property="og:url" content="https://mytoolbench.co/ai-character">
+<meta property="og:site_name" content="Toolbench">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='4' y='4' width='24' height='24' rx='6' fill='none' stroke='%2316171B' stroke-width='3'/><rect x='11' y='11' width='10' height='10' rx='2' fill='%232B41D8'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"AI Character Generator","url":"https://mytoolbench.co/ai-character.html","applicationCategory":"MultimediaApplication","operatingSystem":"Any (web browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
+</head>
+<body>
+<div id="site-header"></div>
+
+<main class="wrap page">
+  <p class="crumb"><a href="index.html">Toolbench</a> &nbsp;/&nbsp; AI Studio &nbsp;/&nbsp; AI Character Generator</p>
+  <div class="tool-head rise"><span class="chip">AI Studio · Free</span></div>
+  <h1 class="title rise d1">AI Character Generator</h1>
+  <p class="subtitle rise d2">Upload one photo and get a polished, photorealistic character you can reuse across marketing images and video. Free for everyone.</p>
+
+  <div class="rise d3">
+  <div class="panel">
+    <p class="panel-label">1 · Upload a photo</p>
+    <input type="file" id="ac-file" accept="image/*" style="padding:10px">
+    <p class="hint">Best with a clear, well-lit face. Your photo is sent securely to the AI image service to generate the character &mdash; it isn&rsquo;t stored by Toolbench.</p>
+    <div id="ac-prev" style="margin-top:14px;display:none"><img id="ac-img" alt="Your photo" style="max-height:170px;border:1px solid var(--line);border-radius:8px;background:#fff"></div>
+  </div>
+
+  <div class="panel">
+    <p class="panel-label">2 · Style</p>
+    <div class="row">
+      <div><label class="field">Pose</label>
+        <select id="ac-pose">
+          <option value="head-and-shoulders portrait">Portrait (head &amp; shoulders)</option>
+          <option value="three-quarter body shot">Three-quarter</option>
+          <option value="full body shot">Full body</option>
+          <option value="holding a product, hands visible">Holding a product</option>
+        </select></div>
+      <div><label class="field">Expression</label>
+        <select id="ac-expr">
+          <option value="natural warm trustworthy">Warm &amp; trustworthy</option>
+          <option value="confident, subtle smile">Confident</option>
+          <option value="big friendly smile">Friendly smile</option>
+          <option value="calm, neutral">Neutral</option>
+        </select></div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <div><label class="field">Scene</label>
+        <select id="ac-scene">
+          <option value="clean studio with soft key light, seamless background">Clean studio</option>
+          <option value="modern lifestyle interior, soft daylight">Lifestyle interior</option>
+          <option value="outdoor city street, natural light, shallow depth of field">Outdoor</option>
+          <option value="cozy kitchen, warm light">Cozy kitchen</option>
+        </select></div>
+      <div><label class="field">Shape</label>
+        <select id="ac-aspect">
+          <option value="1:1">Square (1:1)</option>
+          <option value="4:5">Portrait (4:5)</option>
+          <option value="9:16">Story (9:16)</option>
+          <option value="16:9">Wide (16:9)</option>
+        </select></div>
+    </div>
+    <div class="controls">
+      <button class="btn btn-primary" id="ac-go">Generate character</button>
+      <span class="hint" id="ac-status" style="margin:0;align-self:center"></span>
+    </div>
+  </div>
+
+  <div class="panel" id="ac-resultPanel" style="display:none">
+    <p class="panel-label">Your character</p>
+    <img id="ac-result" alt="Generated character" style="width:100%;max-width:520px;border:1px solid var(--line);border-radius:10px;background:#fff">
+    <div class="controls">
+      <a class="btn btn-ghost btn-sm" id="ac-download" download="character.png">Download image</a>
+      <a class="btn btn-ghost btn-sm" href="ai-talking-video.html">Make it talk &rarr;</a>
+    </div>
+  </div>
+  </div>
+
+  <div class="ad-slot"><div class="ph">AD SLOT &mdash; add your AdSense code here</div></div>
+  <section class="prose" style="margin-top:40px">
+    <h2>About the AI character generator</h2>
+    <p>Upload a single photo and the generator produces a clean, photorealistic character you can use across your marketing &mdash; the same look, ready for different poses, expressions and scenes. Generate a portrait here, then take it to the <a href="ai-talking-video.html">talking video tool</a> to have the character speak in a voice you choose.</p>
+    <p>This tool is free to use. Generation happens on a secure AI service; your uploaded photo is used only to create your character and is not kept by Toolbench.</p>
+  </section>
+</main>
+<div id="site-footer"></div>
+<script src="app.js"></script>
+<script>
+(function(){
+  var fileEl=document.getElementById('ac-file'), img=document.getElementById('ac-img');
+  var dataUrl=null;
+  fileEl.onchange=function(e){
+    var f=e.target.files[0]; if(!f)return;
+    if(f.size>6*1024*1024){window.toast('Please choose a photo under 6 MB');return;}
+    var r=new FileReader();
+    r.onload=function(){dataUrl=r.result; img.src=dataUrl; document.getElementById('ac-prev').style.display='';};
+    r.readAsDataURL(f);
+  };
+  document.getElementById('ac-go').onclick=function(){
+    if(!dataUrl){window.toast('Upload a photo first');return;}
+    var status=document.getElementById('ac-status'), btn=document.getElementById('ac-go');
+    btn.disabled=true; status.textContent='Generating… this can take 20–60 seconds.';
+    fetch('/api/character',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        imageDataUrl:dataUrl,
+        pose:document.getElementById('ac-pose').value,
+        expression:document.getElementById('ac-expr').value,
+        scene:document.getElementById('ac-scene').value,
+        aspect:document.getElementById('ac-aspect').value
+      })})
+      .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
+      .then(function(res){
+        btn.disabled=false; status.textContent='';
+        if(!res.ok){window.toast(res.j.error||'Generation failed'); status.textContent=res.j.error||'Failed'; return;}
+        var out=document.getElementById('ac-result');
+        out.src=res.j.imageUrl;
+        document.getElementById('ac-download').href=res.j.imageUrl;
+        document.getElementById('ac-resultPanel').style.display='';
+        window.toast('Character ready');
+      })
+      .catch(function(err){btn.disabled=false; status.textContent=String(err); window.toast('Network error');});
+  };
+})();
+</script>
+</body>
+</html>
